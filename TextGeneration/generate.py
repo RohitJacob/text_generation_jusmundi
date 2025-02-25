@@ -8,6 +8,7 @@ from TextGeneration.utils.files import json_to_schema, schema_to_json
 from TextGeneration.utils.preprocessor import Preprocessor
 from TextGeneration.utils.schemas import InputSchema, OutputSchema
 
+logging.basicConfig(level=logging.INFO)
 
 def load_model(file_path: str) -> dict:
     """
@@ -46,14 +47,16 @@ def predict_next_word(
     
     # Use the minimum of the model's max n-gram and the requested max n-gram
     max_n_gram = min(model_max_n_gram, max_n_gram)
-    
     # then start with the largest possible n-gram size based on context
     n = min(max_n_gram, len(context) + 1)
-    
+
+    logging.debug(f"Initial n-gram size: {n}")
+
     # Simplified backoff to use largest possible n-gram size
     while n > 0:
         # If the current n-gram size doesn't exist
         if n not in ngram_probs:
+            logging.debug(f"N-gram size {n} not in model data")
             n -= 1
             continue
             
@@ -64,20 +67,24 @@ def predict_next_word(
             context_n = tuple(context[-(n-1):])
         
         if context_n not in ngram_probs[n]:
+            logging.debug(f"Context {context_n} not in ngram_probs[n]")
             n -= 1
             continue
             
         next_words = ngram_probs[n][context_n]
         
         if not next_words:
+            logging.debug(f"No next words for context {context_n}")
             n -= 1
             continue
             
         # Sort by probability
         sorted_words = sorted(next_words.items(), key=lambda x: x[1], reverse=True)
+        logging.debug(f"Sorted words: {sorted_words}")
         
         # Get the top candidates (limit to available candidates)
         top_candidates = sorted_words[:min(use_top_candidate, len(sorted_words))]
+        logging.debug(f"Top candidates: {top_candidates}")
         
         # If we have only one candidate or only considering top 1
         if use_top_candidate == 1 or len(top_candidates) == 1:
@@ -88,6 +95,7 @@ def predict_next_word(
             # Normalize probabilities
             total_prob = sum(probs)
             normalized_probs = [p/total_prob for p in probs]
+            logging.debug(f"Normalized probabilities: {normalized_probs}")
             return random.choices(words, weights=normalized_probs, k=1)[0]
     
     return None

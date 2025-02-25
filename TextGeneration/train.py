@@ -10,7 +10,7 @@ from TextGeneration.utils.files import json_to_schema, read_dir
 from TextGeneration.utils.preprocessor import Preprocessor
 from TextGeneration.utils.schemas import TrainingInputSchema
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 class NGramModel:
     """Class for training an n-gram language model."""
@@ -57,10 +57,9 @@ class NGramModel:
                 context = tuple(words[position:position+n_gram_length-1]) if n_gram_length > 1 else ()
                 next_words = words[position+n_gram_length-1]
                 self.ngram_counts[n_gram_length][context][next_words] += 1
-                logging.info(f"Ngram: {n_gram_length}, Context: {context}, Next words: {next_words}")
+                logging.debug(f"Ngram: {n_gram_length}, Context: {context}, Next words: {next_words}")
 
     def calculate_probabilities(self) -> None:
-        logging.info("Calculating probabilities...")
         for n_gram_length in range(1, self.max_n_grams_to_generate + 1):
             logging.info(f"Calculating probabilities for n_gram_length: {n_gram_length}")
             for context, next_words in self.ngram_counts[n_gram_length].items():
@@ -71,13 +70,13 @@ class NGramModel:
                 }
                 
                 if filtered_next_words:
-                    logging.info(f"Filtered next words: {filtered_next_words}")
+                    logging.debug(f"Filtered next words: {filtered_next_words}")
                     total_count = sum(filtered_next_words.values())
-                    logging.info(f"Total count: {total_count}")
+                    logging.debug(f"Total count: {total_count}")
                     # Calculate probabilities
                     self.ngram_probs[n_gram_length][context] = {word: count / total_count 
                                                    for word, count in filtered_next_words.items()}
-        logging.info(f"Probabilities: {dict(self.ngram_probs)}")
+        logging.debug(f"Probabilities: {dict(self.ngram_probs)}")
 
     def save(self, file_path: str) -> None:
         """Save the model to a file."""
@@ -90,7 +89,7 @@ class NGramModel:
             'max_n_gram': self.max_n_grams_to_generate,
             'ngram_probs': ngram_probs_dict
         }
-        logging.info(f"Model data: {model_data}")
+        logging.debug(f"Model data: {model_data}")
         # Use pickle for saving the model data
         with open(file_path, 'wb') as f:
             pickle.dump(model_data, f)
@@ -112,15 +111,16 @@ def main_train(file_str_path: str) -> None:
         input_schema=TrainingInputSchema
     )
     logging.debug(f"Training schema: {training_schema}")
+    
     model = NGramModel(max_n_grams_to_generate=training_schema.max_n_gram)
         
     # Process each line in the training data
     logging.info("Processing training data...")
     for training_line in read_dir(dir_path=training_schema.input_folder):
-        logging.info(f"Processing training line: {training_line}")
+        logging.debug(f"Processing training line: {training_line}")
         model.process_text(training_line)
     
-    logging.info("Calculating probabilities...")
+    logging.debug("Calculating probabilities...")
     model.calculate_probabilities()
 
     # Save the model
