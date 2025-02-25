@@ -1,0 +1,12 @@
+{
+  "trained_model": "ngram_model.pkl",
+  "max_n_gram": 3,
+  "texts": [
+    "Python is",
+    "The ancient",
+    "Artificial intelligence",
+    ""
+  ],
+  "output_file": "output.json",
+  "use_top_candidate": 3
+}

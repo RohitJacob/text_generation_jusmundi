@@ -1,0 +1,28 @@
+[project]
+requires-python = ">=3.10, <3.12"
+name = "TextGeneration"
+
+[tool.poetry]
+name = "TextGeneration"
+version = "0.1.0"
+description = "Kata regarding Text Generation"
+authors = ["Adrián Cabrera <a.cabrera@jusmundi.com>"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.12"
+pydantic = "^2.9.2"
+
+[tool.poetry.group.format]
+optional = true
+
+[tool.poetry.group.format.dependencies]
+ruff = "^0.6.4"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+

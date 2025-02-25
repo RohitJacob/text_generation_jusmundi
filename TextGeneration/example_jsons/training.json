@@ -1,0 +1,5 @@
+{
+  "trained_model": "ngram_model.pkl",
+  "max_n_gram": 3,
+  "input_folder": "training_data/"
+}
