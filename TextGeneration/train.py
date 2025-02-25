@@ -26,7 +26,7 @@ class NGramModel:
         self.max_n_grams_to_generate = max_n_grams_to_generate
         self.ngram_counts = defaultdict(lambda: defaultdict(Counter))
         self.ngram_probs = defaultdict(lambda: defaultdict(dict))
-        self.min_count = 1 #Since we don't want to generate ngrams with less than 6 occurences, testing with 1
+        self.min_count = 6 #Since we don't want to generate ngrams with less than 6 occurences
 
 
     def process_text(self, line: str) -> None:
